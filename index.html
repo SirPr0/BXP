@@ -5,7 +5,7 @@
   <title>BXP Calculator</title>
   <style>
     body {
-      background-color: #111;
+      background-color: transparent;
       color: #fff;
       font-family: Arial, sans-serif;
       margin: 0;
@@ -15,11 +15,16 @@
     #calculatorIcon {
       cursor: pointer;
       padding: 15px;
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      z-index: 1000;
     }
 
     #calculatorIcon img {
       width: 32px;
       height: 32px;
+      filter: drop-shadow(0 0 2px rgba(0,0,0,0.5));
     }
 
     #calculatorWindow {
@@ -27,15 +32,18 @@
       top: 100px;
       left: 100px;
       width: 320px;
-      background: rgba(43, 43, 43, 0.65);
+      background: rgba(43, 43, 43, 0.95);
       padding: 15px;
       border-radius: 8px;
-      box-shadow: 0 0 10px #000;
+      backdrop-filter: blur(5px);
       display: none;
+      box-shadow: 0 0 15px rgba(0,0,0,0.3);
+      min-width: 300px;
+      min-height: 200px;
     }
 
     .window-header {
-      background: rgba(51, 51, 51, 0.65);
+      background: rgba(51, 51, 51, 0.95);
       padding: 8px;
       border-radius: 5px;
       color: white;
@@ -43,31 +51,34 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+      user-select: none;
     }
 
     .boton-elegante {
-      background: #4caf50;
+      background: rgba(76, 175, 80, 0.9);
       border: none;
       padding: 5px 10px;
       color: white;
       border-radius: 5px;
       cursor: pointer;
       font-size: 0.8em;
-      transition: background 0.3s ease;
+      transition: all 0.3s ease;
     }
 
     .boton-elegante:hover {
-      background: #45a049;
+      background: rgba(69, 160, 73, 0.9);
+      transform: scale(1.05);
     }
 
     .resize-handle {
-      width: 10px;
-      height: 10px;
-      background: #666;
+      width: 12px;
+      height: 12px;
+      background: rgba(102, 102, 102, 0.7);
       position: absolute;
       right: 0;
       bottom: 0;
       cursor: se-resize;
+      border-radius: 3px 0 0 0;
     }
 
     .option-row {
@@ -75,25 +86,32 @@
       justify-content: space-between;
       align-items: center;
       margin: 8px 0;
+      padding: 4px 0;
     }
 
     .option-name {
       display: flex;
       justify-content: space-between;
       width: 100%;
+      font-size: 0.9em;
+      align-items: center;
     }
 
     .option-price {
-      color: #ccc;
+      color: #ddd;
       margin-left: 10px;
+      font-weight: 300;
     }
 
     .input {
       width: 60px;
-      padding: 3px;
+      padding: 5px;
       border-radius: 4px;
-      border: none;
+      border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(0,0,0,0.3);
+      color: #fff;
       margin-left: 10px;
+      font-size: 0.9em;
     }
 
     .modal {
@@ -105,12 +123,13 @@
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%) scale(0.95);
-      background-color: rgba(34, 34, 34, 0.65);
+      background-color: rgba(34, 34, 34, 0.95);
       border-radius: 10px;
       padding: 20px;
       z-index: 1000;
       width: 300px;
-      box-shadow: 0 0 20px rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(5px);
+      box-shadow: 0 0 20px rgba(0,0,0,0.4);
     }
 
     .modal.show {
@@ -131,6 +150,10 @@
       flex-direction: column;
       align-items: center;
       color: white;
+      padding: 5px;
+      border-radius: 5px;
+      background: rgba(0,0,0,0.2);
+      position: relative;
     }
 
     .checkBox {
@@ -151,15 +174,30 @@
       position: absolute;
       top: 0;
       left: 0;
-      background: #4caf50;
       width: 100%;
       height: 100%;
       border-radius: 4px;
-      opacity: 0.5;
-      transition: opacity 0.3s ease;
+      background: rgba(76, 175, 80, 0.3);
+      transition: all 0.3s ease;
     }
 
     .checkBox input[type="checkbox"]:checked ~ .transition {
+      background: rgba(76, 175, 80, 0.9);
+    }
+
+    .checkBox .transition::after {
+      content: "✓";
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: white;
+      font-size: 14px;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .checkBox input[type="checkbox"]:checked ~ .transition::after {
       opacity: 1;
     }
 
@@ -183,10 +221,8 @@
       width: 60px;
       border-radius: 15px;
       overflow: hidden;
-      box-shadow: -8px -4px 8px rgba(50, 50, 50, 0.5),
-        8px 4px 12px rgba(25, 25, 25, 0.5),
-        4px 4px 4px rgba(25, 25, 25, 0.5) inset,
-        -4px -4px 4px rgba(50, 50, 50, 0.5) inset;
+      background: rgba(0,0,0,0.3);
+      box-shadow: 0 0 5px rgba(0,0,0,0.2);
     }
 
     .toggle-state {
@@ -196,7 +232,7 @@
     .indicator {
       height: 100%;
       width: 200%;
-      background: #4caf50;
+      background: rgba(76, 175, 80, 0.9);
       border-radius: 15px;
       transform: translate3d(-75%, 0, 0);
       transition: transform 0.4s cubic-bezier(0.85, 0.05, 0.18, 1.35);
@@ -211,6 +247,7 @@
       color: #fff;
       text-transform: uppercase;
       letter-spacing: 1px;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.3);
     }
 
     .modal-header {
@@ -233,22 +270,25 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
+      padding: 10px 0;
+      border-top: 1px solid rgba(255,255,255,0.1);
     }
 
     #copyBtn {
       margin-left: 10px;
-      padding: 3px 8px;
-      background: #666;
+      padding: 5px 12px;
+      background: rgba(102, 102, 102, 0.7);
       color: white;
       border: none;
       border-radius: 4px;
-      font-size: 0.8em;
+      font-size: 0.85em;
       cursor: pointer;
-      transition: background 0.2s ease;
+      transition: all 0.2s ease;
     }
 
     #copyBtn:hover {
-      background: #555;
+      background: rgba(85, 85, 85, 0.8);
+      transform: scale(1.05);
     }
   </style>
 </head>
@@ -307,7 +347,7 @@
 
     let priceMode = 'NoPerk';
     let visibleCategories = new Set();
-    let inputValues = {};
+    let inputValues = { NoPerk: {}, GCO: {} };
 
     function loadFromStorage() {
       const storedMode = localStorage.getItem('bxp_priceMode');
@@ -342,7 +382,7 @@
       Object.entries(priceLists[priceMode]).forEach(([name, price]) => {
         const div = document.createElement('div');
         div.className = 'option-row';
-        const value = inputValues[name] || 0;
+        const value = inputValues[priceMode][name] || 0;
         div.innerHTML = `
           <div class="option-name">
             ${name} 
@@ -357,7 +397,7 @@
       document.querySelectorAll('.input').forEach((input, index) => {
         input.addEventListener('input', () => {
           const name = Object.keys(priceLists[priceMode])[index];
-          inputValues[name] = parseInt(input.value) || 0;
+          inputValues[priceMode][name] = parseInt(input.value) || 0;
           calculateTotal();
           saveToStorage();
         });
@@ -414,18 +454,24 @@
     function copyRawTotal() {
       const raw = document.getElementById('totalPrice').dataset.raw || '0';
       navigator.clipboard.writeText(raw).then(() => {
-        document.getElementById('copyBtn').textContent = 'Copied!';
-        setTimeout(() => document.getElementById('copyBtn').textContent = 'Copy', 1000);
+        const btn = document.getElementById('copyBtn');
+        btn.textContent = 'Copied!';
+        btn.style.background = '#4CAF50';
+        setTimeout(() => {
+          btn.textContent = 'Copy';
+          btn.style.background = '';
+        }, 1000);
       });
     }
 
+    // Improved window management
     document.getElementById('calculatorIcon').addEventListener('click', function () {
       const window = document.getElementById('calculatorWindow');
       window.style.display = window.style.display === 'none' ? 'block' : 'none';
       if (window.style.display === 'block') calculateTotal();
     });
 
-    // Dragging
+    // Enhanced dragging with boundaries
     let isDragging = false, startX, startY, initialX, initialY;
     document.querySelector('.window-header').addEventListener('mousedown', function (e) {
       isDragging = true;
@@ -434,6 +480,7 @@
       startY = e.clientY;
       initialX = window.offsetLeft;
       initialY = window.offsetTop;
+      document.body.style.userSelect = 'none';
     });
 
     document.addEventListener('mousemove', function (e) {
@@ -441,14 +488,25 @@
         const window = document.getElementById('calculatorWindow');
         const dx = e.clientX - startX;
         const dy = e.clientY - startY;
-        window.style.left = `${initialX + dx}px`;
-        window.style.top = `${initialY + dy}px`;
+        
+        const newX = initialX + dx;
+        const newY = initialY + dy;
+        
+        // Keep window within viewport
+        const maxX = window.innerWidth - window.offsetWidth;
+        const maxY = window.innerHeight - window.offsetHeight;
+        
+        window.style.left = `${Math.max(0, Math.min(newX, maxX))}px`;
+        window.style.top = `${Math.max(0, Math.min(newY, maxY))}px`;
       }
     });
 
-    document.addEventListener('mouseup', () => isDragging = false);
+    document.addEventListener('mouseup', () => {
+      isDragging = false;
+      document.body.style.userSelect = '';
+    });
 
-    // Resizing
+    // Enhanced resizing with constraints
     let isResizing = false, initialWidth, initialHeight;
     document.querySelector('.resize-handle').addEventListener('mousedown', function (e) {
       isResizing = true;
@@ -457,19 +515,23 @@
       startY = e.clientY;
       initialWidth = window.offsetWidth;
       initialHeight = window.offsetHeight;
+      document.body.style.userSelect = 'none';
     });
 
     document.addEventListener('mousemove', function (e) {
       if (isResizing) {
         const window = document.getElementById('calculatorWindow');
-        const width = initialWidth + (e.clientX - startX);
-        const height = initialHeight + (e.clientY - startY);
+        const width = Math.max(300, initialWidth + (e.clientX - startX));
+        const height = Math.max(200, initialHeight + (e.clientY - startY));
         window.style.width = `${width}px`;
         window.style.height = `${height}px`;
       }
     });
 
-    document.addEventListener('mouseup', () => isResizing = false);
+    document.addEventListener('mouseup', () => {
+      isResizing = false;
+      document.body.style.userSelect = '';
+    });
 
     // Initialize
     loadFromStorage();
