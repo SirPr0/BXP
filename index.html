@@ -1,411 +1,480 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>BXP Calculator</title>
-    <style>
-        body {
-            background-color: #111;
-            color: #fff;
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-        }
+  <meta charset="UTF-8" />
+  <title>BXP Calculator</title>
+  <style>
+    body {
+      background-color: #111;
+      color: #fff;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
 
-        #calculatorIcon {
-            cursor: pointer;
-            font-size: 24px;
-            padding: 15px;
-        }
+    #calculatorIcon {
+      cursor: pointer;
+      padding: 15px;
+    }
 
-        #calculatorWindow {
-            position: absolute;
-            top: 100px;
-            left: 100px;
-            width: 320px;
-            background: #2b2b2b;
-            padding: 15px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px #000;
-            display: none;
-        }
+    #calculatorIcon img {
+      width: 32px;
+      height: 32px;
+    }
 
-        .window-header {
-            background: #333;
-            padding: 8px;
-            border-radius: 5px;
-            color: white;
-            cursor: move;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+    #calculatorWindow {
+      position: absolute;
+      top: 100px;
+      left: 100px;
+      width: 320px;
+      background: rgba(43, 43, 43, 0.65);
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px #000;
+      display: none;
+    }
 
-        .boton-elegante {
-            background: #4CAF50;
-            border: none;
-            padding: 5px 10px;
-            color: white;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 0.8em;
-        }
+    .window-header {
+      background: rgba(51, 51, 51, 0.65);
+      padding: 8px;
+      border-radius: 5px;
+      color: white;
+      cursor: move;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
 
-        .resize-handle {
-            width: 10px;
-            height: 10px;
-            background: #666;
-            position: absolute;
-            right: 0;
-            bottom: 0;
-            cursor: se-resize;
-        }
+    .boton-elegante {
+      background: #4caf50;
+      border: none;
+      padding: 5px 10px;
+      color: white;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 0.8em;
+      transition: background 0.3s ease;
+    }
 
-        .option-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin: 8px 0;
-        }
+    .boton-elegante:hover {
+      background: #45a049;
+    }
 
-        .option-name {
-            display: flex;
-            justify-content: space-between;
-            width: 100%;
-        }
+    .resize-handle {
+      width: 10px;
+      height: 10px;
+      background: #666;
+      position: absolute;
+      right: 0;
+      bottom: 0;
+      cursor: se-resize;
+    }
 
-        .option-price {
-            color: #ccc;
-            margin-left: 10px;
-        }
+    .option-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 8px 0;
+    }
 
-        .input {
-            width: 60px;
-            padding: 3px;
-            border-radius: 4px;
-            border: none;
-            margin-left: 10px;
-        }
+    .option-name {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+    }
 
-        /* Modal styles */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background-color: #222;
-            border-radius: 10px;
-            padding: 20px;
-            z-index: 1000;
-            width: 300px;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.7);
-        }
+    .option-price {
+      color: #ccc;
+      margin-left: 10px;
+    }
 
-        .modal.show {
-            display: block;
-        }
+    .input {
+      width: 60px;
+      padding: 3px;
+      border-radius: 4px;
+      border: none;
+      margin-left: 10px;
+    }
 
-        .category-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 15px;
-            margin-top: 15px;
-        }
+    .modal {
+      opacity: 0;
+      visibility: hidden;
+      transform: scale(0.95);
+      transition: all 0.3s ease;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0.95);
+      background-color: rgba(34, 34, 34, 0.65);
+      border-radius: 10px;
+      padding: 20px;
+      z-index: 1000;
+      width: 300px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.7);
+    }
 
-        .category-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            color: white;
-        }
+    .modal.show {
+      opacity: 1;
+      visibility: visible;
+      transform: translate(-50%, -50%) scale(1);
+    }
 
-        .checkBox {
-            position: relative;
-            width: 20px;
-            height: 20px;
-        }
+    .category-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 15px;
+      margin-top: 15px;
+    }
 
-        .checkBox input[type="checkbox"] {
-            opacity: 0;
-            width: 100%;
-            height: 100%;
-            margin: 0;
-            cursor: pointer;
-        }
+    .category-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      color: white;
+    }
 
-        .checkBox .transition {
-            position: absolute;
-            top: 0;
-            left: 0;
-            background: #4CAF50;
-            width: 100%;
-            height: 100%;
-            border-radius: 4px;
-            opacity: 0.5;
-            transition: opacity 0.3s ease;
-        }
+    .checkBox {
+      position: relative;
+      width: 20px;
+      height: 20px;
+    }
 
-        .checkBox input[type="checkbox"]:checked ~ .transition {
-            opacity: 1;
-        }
+    .checkBox input[type="checkbox"] {
+      opacity: 0;
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      cursor: pointer;
+    }
 
-        /* Toggle styles */
-        .toggle-wrapper {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 5px;
-        }
+    .checkBox .transition {
+      position: absolute;
+      top: 0;
+      left: 0;
+      background: #4caf50;
+      width: 100%;
+      height: 100%;
+      border-radius: 4px;
+      opacity: 0.5;
+      transition: opacity 0.3s ease;
+    }
 
-        .label {
-            display: inline-flex;
-            align-items: center;
-            cursor: pointer;
-        }
+    .checkBox input[type="checkbox"]:checked ~ .transition {
+      opacity: 1;
+    }
 
-        .toggle {
-            isolation: isolate;
-            position: relative;
-            height: 30px;
-            width: 60px;
-            border-radius: 15px;
-            overflow: hidden;
-            box-shadow: -8px -4px 8px 0px rgba(50, 50, 50, 0.5),
-                        8px 4px 12px 0px rgba(25, 25, 25, 0.5),
-                        4px 4px 4px 0px rgba(25, 25, 25, 0.5) inset,
-                        -4px -4px 4px 0px rgba(50, 50, 50, 0.5) inset;
-        }
+    .toggle-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+    }
 
-        .toggle-state {
-            display: none;
-        }
+    .label {
+      display: inline-flex;
+      align-items: center;
+      cursor: pointer;
+    }
 
-        .indicator {
-            height: 100%;
-            width: 200%;
-            background: #4CAF50;
-            border-radius: 15px;
-            transform: translate3d(-75%, 0, 0);
-            transition: transform 0.4s cubic-bezier(0.85, 0.05, 0.18, 1.35);
-        }
+    .toggle {
+      isolation: isolate;
+      position: relative;
+      height: 30px;
+      width: 60px;
+      border-radius: 15px;
+      overflow: hidden;
+      box-shadow: -8px -4px 8px rgba(50, 50, 50, 0.5),
+        8px 4px 12px rgba(25, 25, 25, 0.5),
+        4px 4px 4px rgba(25, 25, 25, 0.5) inset,
+        -4px -4px 4px rgba(50, 50, 50, 0.5) inset;
+    }
 
-        .toggle-state:checked + .indicator {
-            transform: translate3d(25%, 0, 0);
-        }
+    .toggle-state {
+      display: none;
+    }
 
-        .price-mode-label {
-            font-size: 0.8em;
-            color: #fff;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
+    .indicator {
+      height: 100%;
+      width: 200%;
+      background: #4caf50;
+      border-radius: 15px;
+      transform: translate3d(-75%, 0, 0);
+      transition: transform 0.4s cubic-bezier(0.85, 0.05, 0.18, 1.35);
+    }
 
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-            padding: 0 8px;
-        }
+    .toggle-state:checked + .indicator {
+      transform: translate3d(25%, 0, 0);
+    }
 
-        .modal-title-container {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
+    .price-mode-label {
+      font-size: 0.8em;
+      color: #fff;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
 
-        #totalPrice {
-            margin-top: 15px;
-            font-weight: bold;
-        }
-    </style>
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+      padding: 0 8px;
+    }
+
+    .modal-title-container {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    #totalContainer {
+      margin-top: 15px;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    #copyBtn {
+      margin-left: 10px;
+      padding: 3px 8px;
+      background: #666;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 0.8em;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+
+    #copyBtn:hover {
+      background: #555;
+    }
+  </style>
 </head>
 <body>
-    <div id="calculatorIcon">🧮</div>
-    <div id="calculatorWindow">
-        <div class="window-header">
-            <span style="font-size: 0.95em;">BXP Calculator</span>
-            <button class="boton-elegante" onclick="showCategoryModal()">Choose BXP</button>
-        </div>
-        <div class="window-content" id="contentArea"></div>
-        <div id="totalPrice">Total: $0</div>
-        <div class="resize-handle"></div>
-    </div>
+  <div id="calculatorIcon">
+    <img src="calculator.png" alt="Calculator Icon" />
+  </div>
 
-    <div id="categoryModal" class="modal">
-        <div class="modal-header">
-            <div class="modal-title-container">
-                <h3 style="margin: 0; font-size: 0.9em; color: #fff;">Select BXP to Show</h3>
-                <div class="toggle-wrapper">
-                    <label class="label">
-                        <div class="toggle">
-                            <input type="checkbox" class="toggle-state" id="priceToggle" onchange="togglePriceMode()">
-                            <div class="indicator"></div>
-                        </div>
-                    </label>
-                    <div id="priceModeLabel" class="price-mode-label">NoPerk</div>
-                </div>
+  <div id="calculatorWindow">
+    <div class="window-header">
+      <span style="font-size: 0.95em;">BXP Calculator</span>
+      <button class="boton-elegante" onclick="toggleCategoryModal()">Choose BXP</button>
+    </div>
+    <div class="window-content" id="contentArea"></div>
+    <div id="totalContainer">
+      <span id="totalPrice" data-raw="0">Total: $0</span>
+      <button id="copyBtn" onclick="copyRawTotal()">Copy</button>
+    </div>
+    <div class="resize-handle"></div>
+  </div>
+
+  <div id="categoryModal" class="modal">
+    <div class="modal-header">
+      <div class="modal-title-container">
+        <h3 style="margin: 0; font-size: 0.9em; color: #fff;">Select BXP to Show</h3>
+        <div class="toggle-wrapper">
+          <label class="label">
+            <div class="toggle">
+              <input type="checkbox" class="toggle-state" id="priceToggle" onchange="togglePriceMode()" />
+              <div class="indicator"></div>
             </div>
-            <button class="boton-elegante close-btn" onclick="toggleCategoryModal()">Close</button>
+          </label>
+          <div id="priceModeLabel" class="price-mode-label">NoPerk</div>
         </div>
-        <div class="category-grid" id="categoryList"></div>
+      </div>
+      <button class="boton-elegante" onclick="toggleCategoryModal()">Close</button>
     </div>
+    <div class="category-grid" id="categoryList"></div>
+  </div>
 
-    <script>
-        const priceLists = {
-            NoPerk: {
-                Airline: 6000, Biz: 3000, Bus: 7000, Cargo: 8000, Conductor: 3000,
-                Ems: 5000, Farming: 2500, Firefighter: 9000, Garbage: 4500, Heli: 10000,
-                Hunting: 6500, Mechanic: 5500, Mining: 2500, Postop: 10000, Racing: 6000,
-                Strength: 1000, Trucking: 800
-            },
-            GCO: {
-                Airline: 5000, Biz: 3500, Bus: 6500, Cargo: 8000, Conductor: 3000,
-                Ems: 3000, Farming: 3000, Firefighter: 8500, Garbage: 3750, Heli: 10000,
-                Hunting: 7500, Mechanic: 6000, Mining: 3000, Postop: 9500, Racing: 6500,
-                Strength: 500, Trucking: 800
-            }
-        };
+  <script>
+    const priceLists = {
+      NoPerk: {
+        Airline: 6000, Biz: 3000, Bus: 7000, Cargo: 8000, Conductor: 3000,
+        Ems: 5000, Farming: 2500, Firefighter: 9000, Garbage: 4500, Heli: 10000,
+        Hunting: 6500, Mechanic: 5500, Mining: 2500, Postop: 10000, Racing: 6000,
+        Strength: 1000, Trucking: 800
+      },
+      GCO: {
+        Airline: 5000, Biz: 3500, Bus: 6500, Cargo: 8000, Conductor: 3000,
+        Ems: 3000, Farming: 3000, Firefighter: 8500, Garbage: 3750, Heli: 10000,
+        Hunting: 7500, Mechanic: 6000, Mining: 3000, Postop: 9500, Racing: 6500,
+        Strength: 500, Trucking: 800
+      }
+    };
 
-        let priceMode = 'NoPerk';
-        let visibleCategories = new Set();
+    let priceMode = 'NoPerk';
+    let visibleCategories = new Set();
+    let inputValues = {};
 
-        function togglePriceMode() {
-            priceMode = priceMode === 'NoPerk' ? 'GCO' : 'NoPerk';
-            document.getElementById('priceModeLabel').textContent = priceMode;
-            initializeCalculator();
-            calculateTotal();
-        }
+    function loadFromStorage() {
+      const storedMode = localStorage.getItem('bxp_priceMode');
+      const storedCategories = localStorage.getItem('bxp_visibleCategories');
+      const storedInputs = localStorage.getItem('bxp_inputValues');
 
-        function initializeCalculator() {
-            const contentArea = document.getElementById('contentArea');
-            contentArea.innerHTML = '';
-            Object.entries(priceLists[priceMode]).forEach(([name, price]) => {
-                const div = document.createElement('div');
-                div.className = 'option-row';
-                div.innerHTML = `
-                    <div class="option-name">
-                        ${name} 
-                        <span class="option-price">$${price.toLocaleString()}</span>
-                    </div>
-                    <input type="number" min="0" class="input" placeholder="Qty" value="0">
-                `;
-                div.style.display = visibleCategories.has(name) ? 'flex' : 'none';
-                contentArea.appendChild(div);
-            });
+      if (storedMode) priceMode = storedMode;
+      if (storedCategories) visibleCategories = new Set(JSON.parse(storedCategories));
+      if (storedInputs) inputValues = JSON.parse(storedInputs);
 
-            document.querySelectorAll('.input').forEach(input => {
-                input.addEventListener('input', calculateTotal);
-            });
-        }
+      document.getElementById('priceToggle').checked = priceMode === 'GCO';
+      document.getElementById('priceModeLabel').textContent = priceMode;
+    }
 
-        function showCategoryModal() {
-            const modal = document.getElementById('categoryModal');
-            const categoryList = document.getElementById('categoryList');
-            categoryList.innerHTML = '';
+    function saveToStorage() {
+      localStorage.setItem('bxp_priceMode', priceMode);
+      localStorage.setItem('bxp_visibleCategories', JSON.stringify(Array.from(visibleCategories)));
+      localStorage.setItem('bxp_inputValues', JSON.stringify(inputValues));
+    }
 
-            Object.keys(priceLists[priceMode]).forEach(name => {
-                const div = document.createElement('div');
-                div.className = 'category-item';
-                div.innerHTML = `
-                    <label class="checkBox">
-                        <input type="checkbox" 
-                            ${visibleCategories.has(name) ? 'checked' : ''} 
-                            onchange="toggleCategory('${name}')">
-                        <div class="transition"></div>
-                    </label>
-                    <div style="margin-top: 5px; font-size: 0.8em;">${name}</div>
-                `;
-                categoryList.appendChild(div);
-            });
+    function togglePriceMode() {
+      priceMode = priceMode === 'NoPerk' ? 'GCO' : 'NoPerk';
+      document.getElementById('priceModeLabel').textContent = priceMode;
+      initializeCalculator();
+      calculateTotal();
+      saveToStorage();
+    }
 
-            modal.classList.add('show');
-        }
+    function initializeCalculator() {
+      const contentArea = document.getElementById('contentArea');
+      contentArea.innerHTML = '';
+      Object.entries(priceLists[priceMode]).forEach(([name, price]) => {
+        const div = document.createElement('div');
+        div.className = 'option-row';
+        const value = inputValues[name] || 0;
+        div.innerHTML = `
+          <div class="option-name">
+            ${name} 
+            <span class="option-price">$${price.toLocaleString()}</span>
+          </div>
+          <input type="number" min="0" class="input" placeholder="Qty" value="${value}">
+        `;
+        div.style.display = visibleCategories.has(name) ? 'flex' : 'none';
+        contentArea.appendChild(div);
+      });
 
-        function toggleCategoryModal() {
-            const modal = document.getElementById('categoryModal');
-            modal.classList.toggle('show');
-        }
-
-        function toggleCategory(category) {
-            if (visibleCategories.has(category)) {
-                visibleCategories.delete(category);
-            } else {
-                visibleCategories.add(category);
-            }
-            initializeCalculator();
-            calculateTotal();
-        }
-
-        function calculateTotal() {
-            let total = 0;
-            document.querySelectorAll('.option-row').forEach((row) => {
-                if (row.style.display === 'flex') {
-                    const name = row.querySelector('.option-name').textContent.trim().split(' ')[0];
-                    const input = row.querySelector('input');
-                    total += priceLists[priceMode][name] * (parseInt(input.value) || 0);
-                }
-            });
-            document.getElementById('totalPrice').textContent = 
-                `Total: $${total.toLocaleString()}`;
-        }
-
-        document.getElementById('calculatorIcon').addEventListener('click', function() {
-            const window = document.getElementById('calculatorWindow');
-            window.style.display = window.style.display === 'none' ? 'block' : 'none';
-            if (window.style.display === 'block') calculateTotal();
+      document.querySelectorAll('.input').forEach((input, index) => {
+        input.addEventListener('input', () => {
+          const name = Object.keys(priceLists[priceMode])[index];
+          inputValues[name] = parseInt(input.value) || 0;
+          calculateTotal();
+          saveToStorage();
         });
+      });
+    }
 
-        // Dragging
-        let isDragging = false, startX, startY, initialX, initialY;
-        document.querySelector('.window-header').addEventListener('mousedown', function(e) {
-            isDragging = true;
-            const window = document.getElementById('calculatorWindow');
-            startX = e.clientX;
-            startY = e.clientY;
-            initialX = window.offsetLeft;
-            initialY = window.offsetTop;
-        });
+    function toggleCategoryModal() {
+      const modal = document.getElementById('categoryModal');
+      modal.classList.toggle('show');
+      showCategoryModal();
+    }
 
-        document.addEventListener('mousemove', function(e) {
-            if (isDragging) {
-                const window = document.getElementById('calculatorWindow');
-                const dx = e.clientX - startX;
-                const dy = e.clientY - startY;
-                window.style.left = `${initialX + dx}px`;
-                window.style.top = `${initialY + dy}px`;
-            }
-        });
+    function showCategoryModal() {
+      const categoryList = document.getElementById('categoryList');
+      categoryList.innerHTML = '';
+      Object.keys(priceLists[priceMode]).forEach(name => {
+        const div = document.createElement('div');
+        div.className = 'category-item';
+        div.innerHTML = `
+          <label class="checkBox">
+            <input type="checkbox" ${visibleCategories.has(name) ? 'checked' : ''} onchange="toggleCategory('${name}')">
+            <div class="transition"></div>
+          </label>
+          <div style="margin-top: 5px; font-size: 0.8em;">${name}</div>
+        `;
+        categoryList.appendChild(div);
+      });
+    }
 
-        document.addEventListener('mouseup', () => isDragging = false);
+    function toggleCategory(category) {
+      if (visibleCategories.has(category)) {
+        visibleCategories.delete(category);
+      } else {
+        visibleCategories.add(category);
+      }
+      initializeCalculator();
+      calculateTotal();
+      saveToStorage();
+    }
 
-        // Resizing
-        let isResizing = false, initialWidth, initialHeight;
-        document.querySelector('.resize-handle').addEventListener('mousedown', function(e) {
-            isResizing = true;
-            const window = document.getElementById('calculatorWindow');
-            startX = e.clientX;
-            startY = e.clientY;
-            initialWidth = window.offsetWidth;
-            initialHeight = window.offsetHeight;
-        });
+    function calculateTotal() {
+      let total = 0;
+      document.querySelectorAll('.option-row').forEach((row) => {
+        if (row.style.display === 'flex') {
+          const name = row.querySelector('.option-name').textContent.trim().split(' ')[0];
+          const input = row.querySelector('input');
+          total += priceLists[priceMode][name] * (parseInt(input.value) || 0);
+        }
+      });
+      document.getElementById('totalPrice').textContent = `Total: $${total.toLocaleString()}`;
+      document.getElementById('totalPrice').dataset.raw = total.toString().replace(/[.,]/g, '');
+    }
 
-        document.addEventListener('mousemove', function(e) {
-            if (isResizing) {
-                const window = document.getElementById('calculatorWindow');
-                const width = initialWidth + (e.clientX - startX);
-                const height = initialHeight + (e.clientY - startY);
-                window.style.width = `${width}px`;
-                window.style.height = `${height}px`;
-            }
-        });
+    function copyRawTotal() {
+      const raw = document.getElementById('totalPrice').dataset.raw || '0';
+      navigator.clipboard.writeText(raw).then(() => {
+        document.getElementById('copyBtn').textContent = 'Copied!';
+        setTimeout(() => document.getElementById('copyBtn').textContent = 'Copy', 1000);
+      });
+    }
 
-        document.addEventListener('mouseup', () => isResizing = false);
+    document.getElementById('calculatorIcon').addEventListener('click', function () {
+      const window = document.getElementById('calculatorWindow');
+      window.style.display = window.style.display === 'none' ? 'block' : 'none';
+      if (window.style.display === 'block') calculateTotal();
+    });
 
-        // Init with all categories selected
-        Object.keys(priceLists[priceMode]).forEach(name => visibleCategories.add(name));
-        initializeCalculator();
-    </script>
+    // Dragging
+    let isDragging = false, startX, startY, initialX, initialY;
+    document.querySelector('.window-header').addEventListener('mousedown', function (e) {
+      isDragging = true;
+      const window = document.getElementById('calculatorWindow');
+      startX = e.clientX;
+      startY = e.clientY;
+      initialX = window.offsetLeft;
+      initialY = window.offsetTop;
+    });
+
+    document.addEventListener('mousemove', function (e) {
+      if (isDragging) {
+        const window = document.getElementById('calculatorWindow');
+        const dx = e.clientX - startX;
+        const dy = e.clientY - startY;
+        window.style.left = `${initialX + dx}px`;
+        window.style.top = `${initialY + dy}px`;
+      }
+    });
+
+    document.addEventListener('mouseup', () => isDragging = false);
+
+    // Resizing
+    let isResizing = false, initialWidth, initialHeight;
+    document.querySelector('.resize-handle').addEventListener('mousedown', function (e) {
+      isResizing = true;
+      const window = document.getElementById('calculatorWindow');
+      startX = e.clientX;
+      startY = e.clientY;
+      initialWidth = window.offsetWidth;
+      initialHeight = window.offsetHeight;
+    });
+
+    document.addEventListener('mousemove', function (e) {
+      if (isResizing) {
+        const window = document.getElementById('calculatorWindow');
+        const width = initialWidth + (e.clientX - startX);
+        const height = initialHeight + (e.clientY - startY);
+        window.style.width = `${width}px`;
+        window.style.height = `${height}px`;
+      }
+    });
+
+    document.addEventListener('mouseup', () => isResizing = false);
+
+    // Initialize
+    loadFromStorage();
+    initializeCalculator();
+    calculateTotal();
+  </script>
 </body>
 </html>
